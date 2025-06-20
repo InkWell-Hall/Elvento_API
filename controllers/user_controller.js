@@ -31,11 +31,12 @@ export const signUp = async (req, res) => {
     } else {
         const hashPassword = await bcrypt.hash(password, 12);
         console.log("hashPassword", hashPassword)
-        const hashotp = await bcrypt.hash(otpGenerator(4), 12);
+        const otp = otpGenerator(4)
+        const hashotp = await bcrypt.hash(otp, 12);
         console.log("hashotp", hashotp)
 
         // generate an otp of 4 numbers for the user
-        const otp = hashotp;
+        // const otp = hashotp;
         // show otp in console.log
         console.log("otp", otp);
 

@@ -17,14 +17,6 @@ export const userModel = new Schema({
         type: String,
         required: true
     },
-    ghanaCard: {
-        type: String,
-        required: true
-    },
-    location: {
-        type: String,
-        required: true
-    },
     accountNumber: {
         type: Number,
         required: true
@@ -37,6 +29,10 @@ export const userModel = new Schema({
         type: String,
         enum: ['Buyer', 'Vendor'],
         default: 'Buyer'
+    },
+    otp:{
+        type: String,
+        default: null
     }
 
 });
