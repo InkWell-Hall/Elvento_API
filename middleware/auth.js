@@ -1,4 +1,6 @@
 import jwt from 'jsonwebtoken'
+import { secret } from '../config/env.js';
+
 
 export const authenticate = (req, res, next) => {
   try {

@@ -70,7 +70,7 @@ export const signUp = async (req, res) => {
 
         // generate a token with user id and role, and the secret key is embedded in it after the signup....this will last for 1 hour
         const token = jwt.sign(
-            { id: saveUserData.id, role: saveUserData.role, otp: saveUserData.otp },
+            { id: saveUserData.id, role: saveUserData.role },
             secret,
             { expiresIn: "1h" }
         )
