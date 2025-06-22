@@ -35,7 +35,7 @@ export const userModel = new Schema({
         default: null
     }
 
-});
+},{timestamps: true});
 
 userModel.plugin(normalize)
 export const User = model('User',userModel);

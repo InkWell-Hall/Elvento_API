@@ -2,9 +2,7 @@
 import Joi from 'joi';
 
 export const orderSchema = Joi.object({
-    items: Joi.array().min(1).required(),
-
-    amount: Joi.string().required(),
+    cart: Joi.string().required(),
 
     address: Joi.string().required(),
 
@@ -16,7 +14,7 @@ export const orderSchema = Joi.object({
 
     payment: Joi.boolean().default(false),
 
-    date: Joi.number().required(),
+    user: Joi.string().required(),
 
-    advert: Joi.string().required()
+    date: Joi.number().required()
 });

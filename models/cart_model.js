@@ -29,7 +29,7 @@ export const cartModel = new Schema({
         type: Number,
         required: true
     }
-});
+},{timestamps: true});
 
 cartModel.plugin(normalize);
 

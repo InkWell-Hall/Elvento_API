@@ -3,12 +3,9 @@ import { model, Schema } from "mongoose";
 import normalize from 'normalize-mongoose';
 
 export const orderModel = new Schema({
-    items: {
-        type: Array,
-        required: true
-    },
-    amount: {
-        type: String,
+    cart: {
+        type: Schema.Types.ObjectId,
+        ref: 'Cart',
         required: true
     },
     address: {
@@ -23,29 +20,24 @@ export const orderModel = new Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum: ['cash on delivery', 'online payment']
+        enum: ['cash on delivery', 'online payment', 'stripe']
     },
     payment: {
         type: Boolean,
         required: true,
         default: false
     },
-    date:{
-        type: Number,
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
-    // user:{
-    //     type: Schema.Types.ObjectId,
-    //     ref:'User',
-    //     required: true
-    // },
-    advert:{
-        type: Schema.Types.ObjectId,
-        ref:'Advert',
+    date: {
+        type: Number,
         required: true
     }
-
-});
+    
+},{timestamps: true});
 
 orderModel.plugin(normalize)
-export const Order = model('Order',orderModel);
+export const Order = model('Order', orderModel);

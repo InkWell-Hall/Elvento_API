@@ -48,7 +48,7 @@ export const advertModel = new Schema({
         required: true
     }
 
-});
+},{timestamps: true});
 
 advertModel.plugin(normalize)
 export const Advert = model('Advert',advertModel);
