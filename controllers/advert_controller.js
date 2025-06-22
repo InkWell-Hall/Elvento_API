@@ -1,6 +1,7 @@
 
 import { Advert } from "../models/advert_model.js"
 import { advertSchema } from "../schemas/advert_schema.js"
+import { buildAdvertFilter } from "../utils/help.js"
 
 
 export const createAdvert = async (req, res) => {
@@ -11,7 +12,7 @@ export const createAdvert = async (req, res) => {
             return res.status(400).json({ message: error.details[0].message })
         }
 
-        const advert = await Advert.create(value)
+        const advert = await Advert.create(value).populate('user', '-password -otp') // exclude password, otp field
         res.status(201).json({ message: 'advert has been created succesfully', advert });
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -23,7 +24,7 @@ export const createAdvert = async (req, res) => {
 export const getallAdverts = async (req, res) => {
 
     try {
-        const adverts = await Advert.find().populate('user')
+        const adverts = await Advert.find().populate('user', '-password -otp') // exclude password, otp field
         return res.status(200).json({ message: 'all adverts', adverts })
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -34,12 +35,29 @@ export const getalluserAdverts = async (req, res) => {
 
     try {
         const userId = req.user.id;
-        const adverts = await Advert.find({ user: userId }).populate('user')
+        const adverts = await Advert.find({ user: userId }).populate('user', '-password -otp') // exclude password, otp field
         return res.status(200).json({ message: 'all adverts', adverts })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
 }
+
+export const getAuserAdverts = async (req, res) => {
+    try {
+        const filter = buildAdvertFilter(req.user.id, req.params.id, req.query.category,req.query.subCategory,req.query.name,req.query.price);
+        const adverts = await Advert.find(filter).populate('user', '-password -otp');
+
+        if (!adverts.length) {
+            return res.status(404).json({ message: 'No matching adverts found' });
+        }
+
+        return res.status(200).json({ message: 'Matching adverts found', adverts });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 
 // export const updateUserAdverts = async (req, res) => {
 

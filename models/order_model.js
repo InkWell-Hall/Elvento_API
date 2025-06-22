@@ -8,6 +8,11 @@ export const orderModel = new Schema({
         ref: 'Cart',
         required: true
     },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     address: {
         type: String,
         required: true
@@ -16,6 +21,11 @@ export const orderModel = new Schema({
         type: String,
         required: true,
         default: 'order placed'
+    },
+    amount: {
+        type: Number,
+        default: 0,
+        required: true
     },
     paymentMethod: {
         type: String,
@@ -26,11 +36,6 @@ export const orderModel = new Schema({
         type: Boolean,
         required: true,
         default: false
-    },
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
     },
     date: {
         type: Number,
