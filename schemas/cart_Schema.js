@@ -6,7 +6,7 @@ export const cartSchema = Joi.object({
         advert: Joi.string().required().trim(),
         quantity: Joi.number().integer().min(1).required(),
     })).required(),
-    totalAmount: Joi.number().required(),
+    totalAmount: Joi.number(),
     user: Joi.string().required().trim(),
     dateAdded: Joi.number().required(),
 });
