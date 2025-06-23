@@ -5,19 +5,32 @@ import { buildAdvertFilter } from "../utils/help.js"
 
 
 export const createAdvert = async (req, res) => {
-    try {
-        const { error, value } = advertSchema.validate(req.body)
-        console.log('value', value)
-        if (error) {
-            return res.status(400).json({ message: error.details[0].message })
-        }
-
-        const advert = await (await Advert.create(value)).populate('user', '-password -otp') // exclude password, otp field
-        res.status(201).json({ message: 'advert has been created succesfully', advert });
-    } catch (error) {
-        res.status(500).json({ message: error.message })
+  try {
+    const { error, value } = advertSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
-}
+
+    // ✅ Extract image URLs from Cloudinary upload (via Multer)
+    const imageUrls = req.files?.map(file => file.path) || [];
+
+    // ✅ Add imageUrls to validated data
+    value.images = imageUrls;
+
+    const advert = await (
+      await Advert.create({
+        ...value,
+        user: req.user.id, // Make sure you're including the user here
+      })
+    ).populate("user", "-password -otp");
+
+    res.status(201).json({ message: "advert has been created succesfully", advert });
+  } catch (error) {
+    console.error("Create Advert Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 
 

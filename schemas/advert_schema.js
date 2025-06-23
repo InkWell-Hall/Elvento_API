@@ -9,6 +9,9 @@ export const advertSchema = Joi.object ({
     subCategory: Joi.string().valid('topwear', 'bottomwear', 'dresses', 'jewellery', 'cosmetics').required(),
     bestSeller: Joi.boolean(),
     date: Joi.number().required(),
-    image: Joi.string().required(),
+    // images: Joi.array()
+    // .items(Joi.string().uri().required()) // if each string is a URL
+    // .min(1)
+    // .required(),
     user: Joi.string().required() 
 });

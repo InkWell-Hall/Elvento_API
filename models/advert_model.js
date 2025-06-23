@@ -38,8 +38,9 @@ export const advertModel = new Schema({
         type: Number,
         required: true
     },
-    image:{
-        type: String,
+    images:{
+        type: [String],
+        default:[],
         required: true
     },
     user:{
