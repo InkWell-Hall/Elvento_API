@@ -12,7 +12,7 @@ export const createAdvert = async (req, res) => {
             return res.status(400).json({ message: error.details[0].message })
         }
 
-        const advert = await Advert.create(value).populate('user', '-password -otp') // exclude password, otp field
+        const advert = await (await Advert.create(value)).populate('user', '-password -otp') // exclude password, otp field
         res.status(201).json({ message: 'advert has been created succesfully', advert });
     } catch (error) {
         res.status(500).json({ message: error.message })
