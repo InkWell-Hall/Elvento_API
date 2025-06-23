@@ -13,3 +13,27 @@ export const authenticate = (req, res, next) => {
     res.status(401).json({ message: "Please authenticate" });
   }
 };
+
+
+export const hasPermission = (permission) => {
+  return async (req, res, next) => {
+    try {
+      const role = req.user.role;
+      const userRole = role.find((element) => element.role === role);
+      console.log('user', role,)
+      console.log('permission', permission)
+      console.log('userdse', userRole.role)
+      if (userRole.role && userRole.permissions.includes(permission)) {
+        console.log('permission', permission)
+        console.log('permissionss', userRole.permissions.includes(permission))
+
+        next();
+      } else {
+        return res.status(403).json("not Authorized");
+      }
+    } catch (error) {
+      console.log('error', error)
+      next();
+    }
+  };
+};
