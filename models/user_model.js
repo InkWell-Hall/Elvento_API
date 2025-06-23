@@ -19,7 +19,6 @@ export const userModel = new Schema({
     },
     accountNumber: {
         type: Number,
-        required: true
     },
     phoneNumber: {
         type: Number,

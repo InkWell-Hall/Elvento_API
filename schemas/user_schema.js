@@ -13,7 +13,7 @@ export const signUpSchema = Joi.object({
     email: Joi.string().required(),
     password: Joi.string().min(5).max(50).required(),
     confirmPassword: Joi.string().min(5).max(50).required().valid(Joi.ref('password')),
-    accountNumber: Joi.string().min(6).max(34).required(),
+    accountNumber: Joi.string().min(6).max(34),
     phoneNumber: Joi.string().min(8).max(15).required(),
     role: Joi.string().valid('Buyer', 'Vendor').default('Buyer')
 })
