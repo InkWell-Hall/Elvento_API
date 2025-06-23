@@ -117,23 +117,27 @@ export const updateUserAdverts = async (req, res) => {
 
 
 export const deluserAdverts = async (req, res) => {
-
     try {
-        const advertId = req.params.id
+        const advertId = req.params.id;
         const userId = req.user.id;
 
-        const advert = await Advert.findById(advertId)
         if (!advertId) {
-            return res.status(400).json({ message: 'Advert ID is required or does not exist' })
+            return res.status(400).json({ message: 'Advert ID is required' });
+        }
+
+        const advert = await Advert.findById(advertId);
+
+        if (!advert) {
+            return res.status(404).json({ message: 'Advert not found' });
         }
 
         if (advert.user.toString() !== userId) {
-            return res.status(403).json({ message: 'you are not authorize to delete this advert' })
+            return res.status(403).json({ message: 'You are not authorized to delete this advert' });
         }
 
         await Advert.findByIdAndDelete(advertId);
-        return res.status(200).json({ message: 'advert deleted', Advert })
+        return res.status(200).json({ message: 'Advert deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        res.status(500).json({ message: error.message });
     }
-}
+};
