@@ -145,36 +145,31 @@ export const deleteCartItem = async (req, res) => {
 };
 
 
-export const getCartWithTotal = async (req, res) => {
+export const getUserCart = async (req, res) => {
   try {
     const userId = req.user.id;
+    const cartId = req.params.id;
+
     if (!userId) {
-      throw new Error("User ID is required");
+      return res.status(401).json({ message: "Unauthorized access" });
     }
-    const cart = await Cart.findOne({ user: userId }).populate("items.advert");
+
+    if (!cartId) {
+      return res.status(400).json({ message: "Cart ID is required" });
+    }
+
+    const cart = await Cart.findOne({ _id: cartId, user: userId })
+      .populate("items.advert")
+      .populate("user", "-password -otp");
+
     if (!cart) {
-      return res.status(400).json({ message: "Cart not found", totalAmount: 0, itemCount: 0 });
+      return res.status(404).json({ message: "Cart not found" });
     }
 
-    // calculate number of items
-
-    let total = 0;
-    const itemCount = cart.items.reduce((total, item) => total + item.quantity, 0);
-    console.log("itemCount", itemCount);
-
-    // calculate total of items
-
-    cart.items.forEach(item => {
-      if (item.advert && item.advert.price) {
-        total += item.quantity * item.advert.price;
-      }
-    });
-
-    cart.totalAmount = parseFloat(total.toFixed(2));
-
-    return res.status(200).json ({ cart, totalAmount: cart.totalAmount, itemCount });
+    return res.status(200).json({ cart });
   } catch (err) {
-    console.error("Error calculating cart total:", err);
-    throw err;
+    console.error("Error fetching cart by ID:", err);
+    return res.status(500).json({ message: err.message });
   }
 };
+
