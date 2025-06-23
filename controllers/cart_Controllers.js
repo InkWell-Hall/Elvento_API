@@ -1,5 +1,6 @@
 import { Cart } from "../models/cart_model.js"
 import { cartSchema } from "../schemas/cart_Schema.js"
+import { calculateCartSummary } from "../utils/help.js";
 
 
 export const getAllcarts = async(req, res) => {
@@ -32,21 +33,16 @@ export const cartStorage = async (req, res) => {
       .populate('items.advert')
       .populate('user', '-password -otp'); // exclude password, otp field
 
-    // calculate number of items
-    let total = 0;
-    const itemCount = populatedCart.items.reduce((total, item) => total + item.quantity, 0);
-    console.log("itemCount", itemCount);
+    const { itemCount, totalAmount } = calculateCartSummary(populatedCart);
 
-    // calculate total of items
-    populatedCart.items.forEach(item => {
-      if (item.advert && item.advert.price) {
-        total += item.quantity * item.advert.price;
-      }
-    });
-    populatedCart.totalAmount = parseFloat(total.toFixed(2));
     await populatedCart.save(); // save the updated cart
 
-    res.status(201).json(populatedCart);
+     res.status(201).json({
+      message: 'Cart created successfully',
+      cart: populatedCart,
+      itemCount,
+      totalAmount
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -88,10 +84,21 @@ export const updateCartItem = async (req, res) => {
     // if the advert is not undefined, it means the user wants to update the advert of the item in the cart...undefined means the user does not want to update the advert of the item in the cart
     await cart.save();
     
-    // after saving the cart, we need to populate the items in the cart with the advert details
-    const updatedCart = await Cart.findById(cartId).populate('items.advert');
+    // ✅ Populate and calculate summary
+    const updatedCart = await Cart.findById(cartId)
+      .populate('items.advert')
+      .populate('user', '-password -otp');
 
-    return res.status(200).json({ message: 'Cart item updated', updatedCart });
+    const { itemCount, totalAmount } = calculateCartSummary(updatedCart);
+
+    await updatedCart.save(); // optional: if totalAmount is part of the model
+
+    return res.status(200).json({
+      message: 'Cart item updated',
+      cart: updatedCart,
+      itemCount,
+      totalAmount
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -117,9 +124,21 @@ export const deleteCartItem = async (req, res) => {
 
     await cart.save();
 
-    const updatedCart = await Cart.findById(cartId).populate('items.advert');
+    // ✅ Populate and calculate summary
+    const updatedCart = await Cart.findById(cartId)
+      .populate('items.advert')
+      .populate('user', '-password -otp');
 
-    return res.status(200).json({ message: 'Cart item deleted', updatedCart });
+    const { itemCount, totalAmount } = calculateCartSummary(updatedCart);
+
+    await updatedCart.save(); // optional: if totalAmount is part of the model
+
+    return res.status(200).json({
+      message: 'Cart item deleted',
+      cart: updatedCart,
+      itemCount,
+      totalAmount
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

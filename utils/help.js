@@ -10,3 +10,30 @@ export const buildAdvertFilter = (userId, advertId, category, price, name, subCa
 
     return filter;
 };
+
+
+// calculate item price in cart
+ export const calculateCartSummary = (populatedCart) => {
+  let total = 0;
+
+  // Count total quantity of items
+  const itemCount = populatedCart.items.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Calculate total amount
+  populatedCart.items.forEach(item => {
+    if (item.advert && item.advert.price) {
+      const price = parseFloat(item.advert.price);
+      if (!isNaN(price)) {
+        total += item.quantity * price;
+      }
+    }
+  });
+
+  // Set totalAmount on the cart (optional)
+  populatedCart.totalAmount = parseFloat(total.toFixed(2));
+
+  return {
+    itemCount,
+    totalAmount: populatedCart.totalAmount
+  };
+};
