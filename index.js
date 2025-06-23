@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import { MONGOURI, PORT } from './config/env.js';
+import { MONGOURI} from './config/env.js';
 import { userRoute } from './routes/user_route.js';
 import { advertRoute } from './routes/advert_route.js';
 import { ordersRoute } from './routes/orders_route.js';
@@ -18,6 +18,7 @@ app.use('/api/V1/user',advertRoute);
 app.use('/api/V1/user',ordersRoute);
 app.use('/api/V1/user',cartRoute);
 
+const PORT = process.env.PORT || 7600;
 await mongoose.connect(MONGOURI);
 
 app.listen(PORT, ()=> {
