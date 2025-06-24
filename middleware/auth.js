@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { secret } from '../config/env.js';
+import { roles } from '../utils/roles.js';
 
 
 export const authenticate = (req, res, next) => {
@@ -19,7 +20,7 @@ export const hasPermission = (permission) => {
   return async (req, res, next) => {
     try {
       const role = req.user.role;
-      const userRole = role.find((element) => element.role === role);
+      const userRole = roles.find((element) => element.role === role);
       console.log('user', role,)
       console.log('permission', permission)
       console.log('userdse', userRole.role)
