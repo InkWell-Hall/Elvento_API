@@ -24,6 +24,7 @@ export const roles = [
             'deluserAdverts',
             'updateUserAdverts',
             'patchService',
+            'getOrderedAdvert'
         ]
     },
 

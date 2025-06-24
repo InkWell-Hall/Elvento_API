@@ -8,4 +8,4 @@ export const ordersRoute = Router();
 
 ordersRoute.post('/order',authenticate,hasPermission("newOrder"),newOrder);
 ordersRoute.get('/order',authenticate,hasPermission("getOrders"),getOrders);
-ordersRoute.get('/order/:id',authenticate,hasPermission("getOneOrder"),getOneOrder); 
+ordersRoute.get('/order/:id',authenticate,hasPermission("getOneOrder"),getOneOrder);

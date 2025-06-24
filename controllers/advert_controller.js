@@ -1,5 +1,6 @@
 
 import { Advert } from "../models/advert_model.js"
+import { Order } from "../models/order_model.js";
 import { advertSchema } from "../schemas/advert_schema.js"
 import { buildAdvertFilter } from "../utils/help.js"
 
@@ -36,38 +37,38 @@ export const createAdvert = async (req, res) => {
 
 export const getallAdverts = async (req, res) => {
 
-    try {
-        const adverts = await Advert.find().populate('user', '-password -otp') // exclude password, otp field
-        return res.status(200).json({ message: 'all adverts', adverts })
-    } catch (error) {
-        res.status(500).json({ message: error.message })
-    }
+  try {
+    const adverts = await Advert.find().populate('user', '-password -otp') // exclude password, otp field
+    return res.status(200).json({ message: 'all adverts', adverts })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
 }
 
 export const getalluserAdverts = async (req, res) => {
 
-    try {
-        const userId = req.user.id;
-        const adverts = await Advert.find({ user: userId }).populate('user', '-password -otp') // exclude password, otp field
-        return res.status(200).json({ message: 'all adverts', adverts })
-    } catch (error) {
-        res.status(500).json({ message: error.message })
-    }
+  try {
+    const userId = req.user.id;
+    const adverts = await Advert.find({ user: userId }).populate('user', '-password -otp') // exclude password, otp field
+    return res.status(200).json({ message: 'all adverts', adverts })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
 }
 
 export const getAuserAdverts = async (req, res) => {
-    try {
-        const filter = buildAdvertFilter(req.user.id, req.params.id, req.query.category,req.query.subCategory,req.query.name,req.query.price);
-        const adverts = await Advert.find(filter).populate('user', '-password -otp');
+  try {
+    const filter = buildAdvertFilter(req.user.id, req.params.id, req.query.category, req.query.subCategory, req.query.name, req.query.price);
+    const adverts = await Advert.find(filter).populate('user', '-password -otp');
 
-        if (!adverts.length) {
-            return res.status(404).json({ message: 'No matching adverts found' });
-        }
-
-        return res.status(200).json({ message: 'Matching adverts found', adverts });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    if (!adverts.length) {
+      return res.status(404).json({ message: 'No matching adverts found' });
     }
+
+    return res.status(200).json({ message: 'Matching adverts found', adverts });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 
@@ -130,27 +131,55 @@ export const updateUserAdverts = async (req, res) => {
 
 
 export const deluserAdverts = async (req, res) => {
-    try {
-        const advertId = req.params.id;
-        const userId = req.user.id;
+  try {
+    const advertId = req.params.id;
+    const userId = req.user.id;
 
-        if (!advertId) {
-            return res.status(400).json({ message: 'Advert ID is required' });
-        }
-
-        const advert = await Advert.findById(advertId);
-
-        if (!advert) {
-            return res.status(404).json({ message: 'Advert not found' });
-        }
-
-        if (advert.user.toString() !== userId) {
-            return res.status(403).json({ message: 'You are not authorized to delete this advert' });
-        }
-
-        await Advert.findByIdAndDelete(advertId);
-        return res.status(200).json({ message: 'Advert deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    if (!advertId) {
+      return res.status(400).json({ message: 'Advert ID is required' });
     }
+
+    const advert = await Advert.findById(advertId);
+
+    if (!advert) {
+      return res.status(404).json({ message: 'Advert not found' });
+    }
+
+    if (advert.user.toString() !== userId) {
+      return res.status(403).json({ message: 'You are not authorized to delete this advert' });
+    }
+
+    await Advert.findByIdAndDelete(advertId);
+    return res.status(200).json({ message: 'Advert deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const getOrderedAdvert = async (req, res) => {
+  try {
+    // this get all ids from adverts created by the vendor
+    const VendorID = req.user.userId;
+    const adverts = await Advert.find({ user: VendorID }).select('_id');
+    const advertIDs = adverts.map(advert => advert.id);
+
+    // find all orders that contains the items.advert created by the vendor and populate the buyer and the items
+    const orders = await Order.find({ 'items.advert': { $in: advertIDs } })
+      .populate('user', '-password -otp') // Populate buyer
+      .populate('items.advert');          // Populate advert inside items
+
+    // const unique users or 
+    const uniqueUserIds = new Set(orders.map(order => order.user._id.toString()));
+
+    res.json({
+      totalOrders: orders.length,
+      uniqueCustomers: uniqueUserIds.size,
+      orders, // optional: send populated orders if needed
+    });
+
+  } catch (error) {
+    console.log(error.message)
+    return res.status(500).json({ message: 'Server Error' })
+  };
 };
