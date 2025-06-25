@@ -42,7 +42,7 @@ export const advertModel = new Schema({
         default:[],
         required: true
     },
-    user:{
+    userid:{
         type: Schema.Types.ObjectId,
         ref:'User',
         required: true
