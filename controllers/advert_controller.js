@@ -1,65 +1,308 @@
 
-import { Advert } from "../models/advert_model.js"
-import { Order } from "../models/order_model.js";
-import { advertSchema } from "../schemas/advert_schema.js"
+// import { Advert } from "../models/advert_model.js"
+// import { Order } from "../models/order_model.js";
+// import { advertSchema } from "../schemas/advert_schema.js"
+// import { buildAdvertFilter } from "../utils/help.js"
+
+
+// export const createAdvert = async (req, res) => {
+//   try {
+//     const { error, value } = advertSchema.validate(req.body);
+//     if (error) {
+//       return res.status(400).json({ message: error.details[0].message });
+//     }
+
+//     // ✅ Extract image URLs from Cloudinary upload (via Multer)
+//     const imageUrls = req.files?.map(file => file.path) || [];
+
+//     // ✅ Add imageUrls to validated data
+//     value.images = imageUrls;
+
+//     const advert = await (
+//       await Advert.create({
+//         ...value,
+//         user: req.user.id, // Make sure you're including the user here
+//       })
+//     ).populate("user", "-password -otp");
+
+//     res.status(201).json({ message: "advert has been created succesfully", advert });
+//   } catch (error) {
+//     console.error("Create Advert Error:", error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
+
+
+// export const getallAdverts = async (req, res) => {
+
+//   try {
+//     const adverts = await Advert.find().populate('user', '-password -otp') // exclude password, otp field
+//     return res.status(200).json({ message: 'all adverts', adverts })
+//   } catch (error) {
+//     res.status(500).json({ message: error.message })
+//   }
+// }
+
+// export const getalluserAdverts = async (req, res) => {
+
+//   try {
+//     const userId = req.user.id;
+//     const adverts = await Advert.find({ user: userId }).populate('user', '-password -otp') // exclude password, otp field
+//     return res.status(200).json({ message: 'all adverts', adverts })
+//   } catch (error) {
+//     res.status(500).json({ message: error.message })
+//   }
+// }
+
+// export const getAuserAdverts = async (req, res) => {
+//   try {
+//     const filter = buildAdvertFilter(req.user.id, req.params.id, req.query.category, req.query.subCategory, req.query.name, req.query.price);
+//     const adverts = await Advert.find(filter).populate('user', '-password -otp');
+
+//     if (!adverts.length) {
+//       return res.status(404).json({ message: 'No matching adverts found' });
+//     }
+
+//     return res.status(200).json({ message: 'Matching adverts found', adverts });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
+
+// // export const updateUserAdverts = async (req, res) => {
+
+// //     try {
+// //         const userId = req.user.id;
+// //         const advertId = req.params.id;
+// //         const advert = await Advert.findById(advertId)
+// //         if (!advertId) {
+// //             return res.status(400).json({ message: 'Advert ID is required or does not exist' })
+// //         }
+
+// //         if (advert.user.toString() !== userId) {
+// //             return res.status(403).json({ message: 'you are not authorize to Edit this advert' })
+// //         }
+// //         const updatedAdvert = await Advert.findOneAndUpdate(
+// //             { id: advertId, user: userId },
+// //             req.body,
+// //             { new: true } // return the updated document
+// //         );
+// //         return res.status(200).json({ message: 'Updated', updatedAdvert })
+// //     } catch (error) {
+// //         res.status(500).json({ message: error.message })
+// //     }
+// // }
+
+// export const updateUserAdverts = async (req, res) => {
+//   try {
+//     const userId = req.user.id;
+//     const advertId = req.params.id;
+
+//     const advert = await Advert.findById(advertId);
+//     if (!advert) {
+//       return res.status(404).json({ message: 'Advert not found' });
+//     }
+
+//     if (advert.user.toString() !== userId) {
+//       return res.status(403).json({ message: 'You are not authorized to edit this advert' });
+//     }
+
+//     const updatedAdvert = await Advert.findOneAndUpdate(
+//       { _id: advertId, user: userId }, // ✅ use 'user', not 'userId'
+//       req.body,
+//       { new: true }
+//     );
+
+//     if (!updatedAdvert) {
+//       return res.status(400).json({ message: 'Update failed' });
+//     }
+
+//     return res.status(200).json({ message: 'Updated', updatedAdvert });
+
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
+
+// export const deluserAdverts = async (req, res) => {
+//   try {
+//     const advertId = req.params.id;
+//     const userId = req.user.id;
+
+//     if (!advertId) {
+//       return res.status(400).json({ message: 'Advert ID is required' });
+//     }
+
+//     const advert = await Advert.findById(advertId);
+
+//     if (!advert) {
+//       return res.status(404).json({ message: 'Advert not found' });
+//     }
+
+//     if (advert.user.toString() !== userId) {
+//       return res.status(403).json({ message: 'You are not authorized to delete this advert' });
+//     }
+
+//     await Advert.findByIdAndDelete(advertId);
+//     return res.status(200).json({ message: 'Advert deleted successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
+// export const getOrderedAdvert = async (req, res) => {
+//   try {
+//     // this get all ids from adverts created by the vendor
+//     const VendorID = req.user.userId;
+//     const adverts = await Advert.find({ user: VendorID }).select('_id');
+//     const advertIDs = adverts.map(advert => advert.id);
+
+//     // find all orders that contains the items.advert created by the vendor and populate the buyer and the items
+//     const orders = await Order.find({ 'items.advert': { $in: advertIDs } })
+//       .populate('user', '-password -otp') // Populate buyer
+//       .populate('items.advert');          // Populate advert inside items
+
+//     // const unique users or 
+//     const uniqueUserIds = new Set(orders.map(order => order.user._id.toString()));
+
+//     res.json({
+//       totalOrders: orders.length,
+//       uniqueCustomers: uniqueUserIds.size,
+//       orders, // optional: send populated orders if needed
+//     });
+
+//   } catch (error) {
+//     console.log(error.message)
+//     return res.status(500).json({ message: 'Server Error' })
+//   };
+// };
+
+import {v2 as cloudinary } from "cloudinary"
+import { Product } from "../models/advert_model.js"
 import { buildAdvertFilter } from "../utils/help.js"
 
 
-export const createAdvert = async (req, res) => {
+
+//function for adding product
+export const addProduct = async (req, res) => {
+    try {
+        const {name, description, price, category, subCategory, sizes, bestseller} = req.body
+
+        const image1 = req.files.image1 && req.files.image1[0]
+        const image2 = req.files.image2 && req.files.image2[0]
+        const image3 = req.files.image3 && req.files.image3[0]
+        const image4 = req.files.image4 && req.files.image4[0]
+
+        const images = [image1,image2,image3,image4].filter((item) => item !== undefined)
+        let imagesUrl= await Promise.all(
+            images.map(async (item) => {
+                let result = await cloudinary.uploader.upload(item.path, {resource_type: "image"});
+                return result.secure_url
+            })
+        )
+
+        const productData = {
+            name,
+            description,
+            category,
+            price: Number(price), 
+            subCategory,
+            bestseller: bestseller === "true" ? true : false, 
+            sizes: JSON.parse(sizes),
+            image: imagesUrl,
+            date: Date.now()
+        }
+
+        console.log(productData);
+
+        const product = new Product (productData);
+        await product.save()
+
+        res.json({success:true, message: "Product Added"})
+    } catch (error) {
+        console.log(error)
+        res.json({success:false, message:error.message})
+    }
+}
+
+//function for listing product
+export const listProducts = async (req, res) => {
+    
+    try {
+        const products = await Product.find({});
+        res.json({success:true, products})
+    } catch (error) {
+        console.log(error)
+        res.json({success: false, message: error.message})
+    }
+}
+//function for removing a product
+export const removeProduct = async (req, res) => {
+        try {
+            await Product.findByIdAndDelete(req.body.id)
+            res.json({success: true, message: "Product Removed"})
+        } catch (error) {
+            console.log(error)
+            res.json({success: false, message: error.message})
+        }
+}
+//function for adding  single  product
+export const singleProduct = async (req, res) => {
+    try {
+
+        const { productId } = req.body
+        const product = await Product.findById(productId)
+        res.json({success:true, product})
+
+    } catch (error) {
+        console.log(error)
+        res.json({success: false, message: error.message})
+    }
+}
+
+export const updateUserproduct = async (req, res) => {
   try {
-    const { error, value } = advertSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
+    const userId = req.user.id;
+    const productId = req.params.id;
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Advert not found' });
     }
 
-    // ✅ Extract image URLs from Cloudinary upload (via Multer)
-    const imageUrls = req.files?.map(file => file.path) || [];
+    if (product.user.toString() !== userId) {
+      return res.status(403).json({ message: 'You are not authorized to edit this advert' });
+    }
 
-    // ✅ Add imageUrls to validated data
-    value.images = imageUrls;
+    const updatedProduct = await Product.findOneAndUpdate(
+      { _id: productId, user: userId }, // ✅ use 'user', not 'userId'
+      req.body,
+      { new: true }
+    );
 
-    const advert = await (
-      await Advert.create({
-        ...value,
-        user: req.user.id, // Make sure you're including the user here
-      })
-    ).populate("user", "-password -otp");
+    if (!updatedProduct) {
+      return res.status(400).json({ message: 'Update failed' });
+    }
 
-    res.status(201).json({ message: "advert has been created succesfully", advert });
+    return res.status(200).json({ message: 'Updated', updatedProduct });
+
   } catch (error) {
-    console.error("Create Advert Error:", error);
     res.status(500).json({ message: error.message });
   }
 };
 
 
-
-
-export const getallAdverts = async (req, res) => {
-
-  try {
-    const adverts = await Advert.find().populate('user', '-password -otp') // exclude password, otp field
-    return res.status(200).json({ message: 'all adverts', adverts })
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
-
-export const getalluserAdverts = async (req, res) => {
-
-  try {
-    const userId = req.user.id;
-    const adverts = await Advert.find({ user: userId }).populate('user', '-password -otp') // exclude password, otp field
-    return res.status(200).json({ message: 'all adverts', adverts })
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-}
-
-export const getAuserAdverts = async (req, res) => {
+export const getAuserProduct = async (req, res) => {
   try {
     const filter = buildAdvertFilter(req.user.id, req.params.id, req.query.category, req.query.subCategory, req.query.name, req.query.price);
-    const adverts = await Advert.find(filter).populate('user', '-password -otp');
+    const adverts = await Product.find(filter).populate('user', '-password -otp');
 
     if (!adverts.length) {
       return res.status(404).json({ message: 'No matching adverts found' });
@@ -71,115 +314,13 @@ export const getAuserAdverts = async (req, res) => {
   }
 };
 
+export const getalluserProduct = async (req, res) => {
 
-
-// export const updateUserAdverts = async (req, res) => {
-
-//     try {
-//         const userId = req.user.id;
-//         const advertId = req.params.id;
-//         const advert = await Advert.findById(advertId)
-//         if (!advertId) {
-//             return res.status(400).json({ message: 'Advert ID is required or does not exist' })
-//         }
-
-//         if (advert.user.toString() !== userId) {
-//             return res.status(403).json({ message: 'you are not authorize to Edit this advert' })
-//         }
-//         const updatedAdvert = await Advert.findOneAndUpdate(
-//             { id: advertId, user: userId },
-//             req.body,
-//             { new: true } // return the updated document
-//         );
-//         return res.status(200).json({ message: 'Updated', updatedAdvert })
-//     } catch (error) {
-//         res.status(500).json({ message: error.message })
-//     }
-// }
-
-export const updateUserAdverts = async (req, res) => {
   try {
     const userId = req.user.id;
-    const advertId = req.params.id;
-
-    const advert = await Advert.findById(advertId);
-    if (!advert) {
-      return res.status(404).json({ message: 'Advert not found' });
-    }
-
-    if (advert.user.toString() !== userId) {
-      return res.status(403).json({ message: 'You are not authorized to edit this advert' });
-    }
-
-    const updatedAdvert = await Advert.findOneAndUpdate(
-      { _id: advertId, user: userId }, // ✅ use 'user', not 'userId'
-      req.body,
-      { new: true }
-    );
-
-    if (!updatedAdvert) {
-      return res.status(400).json({ message: 'Update failed' });
-    }
-
-    return res.status(200).json({ message: 'Updated', updatedAdvert });
-
+    const product = await Product.find({ user: userId }).populate('user', '-password -otp') // exclude password, otp field
+    return res.status(200).json({ message: 'all Product', product })
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message })
   }
-};
-
-
-
-export const deluserAdverts = async (req, res) => {
-  try {
-    const advertId = req.params.id;
-    const userId = req.user.id;
-
-    if (!advertId) {
-      return res.status(400).json({ message: 'Advert ID is required' });
-    }
-
-    const advert = await Advert.findById(advertId);
-
-    if (!advert) {
-      return res.status(404).json({ message: 'Advert not found' });
-    }
-
-    if (advert.user.toString() !== userId) {
-      return res.status(403).json({ message: 'You are not authorized to delete this advert' });
-    }
-
-    await Advert.findByIdAndDelete(advertId);
-    return res.status(200).json({ message: 'Advert deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
-export const getOrderedAdvert = async (req, res) => {
-  try {
-    // this get all ids from adverts created by the vendor
-    const VendorID = req.user.userId;
-    const adverts = await Advert.find({ user: VendorID }).select('_id');
-    const advertIDs = adverts.map(advert => advert.id);
-
-    // find all orders that contains the items.advert created by the vendor and populate the buyer and the items
-    const orders = await Order.find({ 'items.advert': { $in: advertIDs } })
-      .populate('user', '-password -otp') // Populate buyer
-      .populate('items.advert');          // Populate advert inside items
-
-    // const unique users or 
-    const uniqueUserIds = new Set(orders.map(order => order.user._id.toString()));
-
-    res.json({
-      totalOrders: orders.length,
-      uniqueCustomers: uniqueUserIds.size,
-      orders, // optional: send populated orders if needed
-    });
-
-  } catch (error) {
-    console.log(error.message)
-    return res.status(500).json({ message: 'Server Error' })
-  };
-};
+}
