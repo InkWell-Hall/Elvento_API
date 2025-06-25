@@ -7,6 +7,5 @@ export const cartSchema = Joi.object({
         quantity: Joi.number().integer().min(1).required(),
     })).required(),
     totalAmount: Joi.number(),
-    user: Joi.string().required(),
     dateAdded: Joi.number().required(),
 });

@@ -18,33 +18,37 @@ export const advertModel = new Schema({
     },
     size: {
         type: [String],
-        enum: ['S', 'M', 'L', 'XL', 'XXL'],
+        enum:['S', 'M', 'L', 'XL','XXL'],
         required: true
     },
     category: {
         type: String,
-        enum: ['matchingSet', 'top', 'kids', 'beauty'],
+        enum:['matchingSet', 'top', 'kids', 'beauty'],
         required: true
     },
     subCategory: {
         type: String,
-        enum: ['topwear', 'bottomwear', "dresses", "jewellery", "cosmetics"],
+        enum: ['topwear', 'bottomwear', "dresses", "jewellery","cosmetics"],
         required: true
     },
-    bestSeller: {
+    bestSeller:{
         type: Boolean,
     },
-    date: {
+    date:{
         type: Number,
     },
-    images: {
+    images:{
         type: [String],
-        default: [],
+        default:[],
+        required: true
+    },
+    user:{
+        type: Schema.Types.ObjectId,
+        ref:'User',
         required: true
     }
 
-
-}, { timestamps: true });
+},{timestamps: true});
 
 advertModel.plugin(normalize)
-export const Advert = model('Advert', advertModel);
+export const Advert = model('Advert',advertModel);
