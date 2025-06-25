@@ -16,5 +16,4 @@ export const advertSchema = Joi.object ({
     // .items(Joi.string().uri().required()) // if each string is a URL
     // .min(1)
     // .required(),
-    userid: Joi.string().required() 
 });
