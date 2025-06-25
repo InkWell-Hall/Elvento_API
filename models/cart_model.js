@@ -27,7 +27,6 @@ export const cartModel = new Schema({
     },
     dateAdded: {
         type: Number,
-        required: true
     }
 },{timestamps: true});
 
