@@ -8,7 +8,7 @@ export const advertSchema = Joi.object({
         .items(Joi.string().valid('S', 'M', 'L', 'XL', 'XXL'))
         .min(1)
         .required(),
-    category: Joi.string().valid('matchingSet', 'top', 'kids', 'beauty').required(),
+    category: Joi.string().valid('matchingSet', 'top', 'kids', 'beauty','curve','men','women').required(),
     subCategory: Joi.string().valid('topwear', 'bottomwear', 'dresses', 'jewellery', 'cosmetics').required(),
     bestSeller: Joi.boolean(),
     date: Joi.number(),
