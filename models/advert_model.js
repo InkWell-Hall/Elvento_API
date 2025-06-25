@@ -17,8 +17,8 @@ export const advertModel = new Schema({
         required: true
     },
     size: {
-        type: String,
-        enum:['s', 'm', 'l', 'xl','xxl'],
+        type: [String],
+        enum:['S', 'M', 'L', 'XL','XXL'],
         required: true
     },
     category: {

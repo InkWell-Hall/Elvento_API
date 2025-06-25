@@ -19,7 +19,7 @@ export const signUp = async (req, res) => {
         return res.status(400).json({ error })
     }
 
-    const { password, email } = value;
+    const { password, email, role } = value;
 
     // finds if the user already exist by using the email
     const findUser = await User.findOne({ email: value.email });
@@ -31,14 +31,14 @@ export const signUp = async (req, res) => {
     } else {
         const hashPassword = await bcrypt.hash(password, 12);
         console.log("hashPassword", hashPassword)
-        const otp = otpGenerator(4)
-        const hashotp = await bcrypt.hash(otp, 12);
-        console.log("hashotp", hashotp)
+        // const otp = otpGenerator(4)
+        // const hashotp = await bcrypt.hash(otp, 12);
+        // console.log("hashotp", hashotp)
 
         // generate an otp of 4 numbers for the user
         // const otp = hashotp;
         // show otp in console.log
-        console.log("otp", otp);
+        // console.log("otp", otp);
 
         // save the new user details in the database using the format below.
         // const saveUserData = await User.create({
@@ -54,15 +54,15 @@ export const signUp = async (req, res) => {
         const saveUserData = await User.create({
             ...value,
             password: hashPassword,
-            otp: hashotp,
-            otpExpiresAt: new Date(Date.now() + 5 * 60 * 1000)
+            // otp: hashotp,
+            // otpExpiresAt: new Date(Date.now() + 5 * 60 * 1000)
         });
 
         // show the saved user details in the console
         console.log("savedata", saveUserData)
 
         // send otp to email
-        await sendOtpEmail(email, otp)
+        await sendOtpEmail(email, role)
         console.log("otp sent to email", email)
 
         // secrete key with jwt

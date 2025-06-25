@@ -14,26 +14,28 @@ const transporter = nodemailer.createTransport({
 });
 
 // send the mail
-export const sendOtpEmail = async (email, otp) => {
+export const sendOtpEmail = async (email, role) => {
     try {
         const info = await transporter.sendMail({
             from: SMTP_USER, // sender address
             to: email, // list of receivers
-            subject: "OTP MESSAGE", // Subject line
-            text: `Verify your account with this OTP:${otp}`,  // plain text body
-            html: `<div style="font-family: Arial, sans-serif; color: #222; background: #f9f9f9; padding: 24px; border-radius: 8px;">
-  <h2 style="color: #2d7ff9;">Your One-Time Password (OTP)</h2>
-  <p style="font-size: 18px;">
-    <b style="font-size: 28px; letter-spacing: 4px;">${otp}</b>
+            subject: "User Account Verified", // Subject line
+text: `Your user account with the email ${email} has been successfully verified. You have registered as a ${role}.`, // plain text body
+html: `<div style="font-family: Arial, sans-serif; color: #222; background: #f9f9f9; padding: 24px; border-radius: 8px;">
+  <h2 style="color: #2d7ff9;">Your User Account Has Been Verified</h2>
+  <p style="font-size: 16px;">
+    Hello, your account associated with the email 
+    <b style="color: #2d7ff9;">${email}</b> has been successfully verified.
   </p>
-  <p>
-    Please use this OTP to complete your verification. <br>
-    <span style="color: #d9534f;"><b>This code will expire in 5 minutes.</b></span>
+  <p style="font-size: 16px;">
+    You have registered as a 
+    <b style="color: #2d7ff9;">${role}</b>.
   </p>
   <p style="font-size: 14px; color: #888;">
-    If you did not request this, please ignore this email.
+    If you did not sign up for this account, please ignore this email or contact support.
   </p>
-</div>`, // html body
+</div>`
+, // html body
         });
         // log the mesage id in the console
         console.log("Message sent: %s", info.messageId);
