@@ -262,14 +262,15 @@ export const addProduct = async (req, res) => {
       bestseller: bestSeller === "true" || bestSeller === true,
       sizes: parsedSizes,
       image: imagesUrl,
-      date: Date.now()
+      date: Date.now(),
+      uer:req.user.id
     };
 
     console.log("Product data to save:", productData);
 
     // Save product to database
     const product = new Advert(productData);
-    await product.save();
+    await product.save().populate('user', '-password -otp');
 
     res.status(201).json({
       success: true,
