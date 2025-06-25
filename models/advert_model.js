@@ -36,7 +36,6 @@ export const advertModel = new Schema({
     },
     date:{
         type: Number,
-        required: true
     },
     images:{
         type: [String],
