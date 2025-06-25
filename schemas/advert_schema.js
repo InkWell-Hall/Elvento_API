@@ -4,7 +4,7 @@ export const advertSchema = Joi.object({
     name: Joi.string().required(),
     description: Joi.string().required(),
     price: Joi.number().required(),
-    size: Joi.array()
+    sizes: Joi.array()
         .items(Joi.string().valid('S', 'M', 'L', 'XL', 'XXL'))
         .min(1)
         .required(),
