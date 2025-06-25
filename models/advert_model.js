@@ -70,4 +70,4 @@ export const productSchema = new Schema({
 
 productSchema.plugin(normalize);
 
-export const Product = model("Product", productSchema);
+export const Advert = model("Advert", productSchema);

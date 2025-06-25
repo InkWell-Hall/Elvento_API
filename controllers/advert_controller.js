@@ -185,7 +185,7 @@
 // };
 
 import { v2 as cloudinary } from "cloudinary"
-import { Product } from "../models/advert_model.js"
+import { Advert} from "../models/advert_model.js"
 import { buildAdvertFilter } from "../utils/help.js"
 
 
@@ -268,7 +268,7 @@ export const addProduct = async (req, res) => {
     console.log("Product data to save:", productData);
 
     // Save product to database
-    const product = new Product(productData);
+    const product = new Advert(productData);
     await product.save();
 
     res.status(201).json({
@@ -290,29 +290,31 @@ export const addProduct = async (req, res) => {
 export const listProducts = async (req, res) => {
 
   try {
-    const products = await Product.find({});
+    const products = await Advert.find({});
     res.json({ success: true, products })
   } catch (error) {
     console.log(error)
     res.json({ success: false, message: error.message })
   }
 }
+
 //function for removing a product
 export const removeProduct = async (req, res) => {
   try {
-    await Product.findByIdAndDelete(req.body.id)
+    await Advert.findByIdAndDelete(req.body.id)
     res.json({ success: true, message: "Product Removed" })
   } catch (error) {
     console.log(error)
     res.json({ success: false, message: error.message })
   }
 }
+
 //function for adding  single  product
 export const singleProduct = async (req, res) => {
   try {
 
     const { productId } = req.body
-    const product = await Product.findById(productId)
+    const product = await Advert.findById(productId)
     res.json({ success: true, product })
 
   } catch (error) {
@@ -326,7 +328,7 @@ export const updateUserproduct = async (req, res) => {
     const userId = req.user.id;
     const productId = req.params.id;
 
-    const product = await Product.findById(productId);
+    const product = await Advert.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Advert not found' });
     }
@@ -335,7 +337,7 @@ export const updateUserproduct = async (req, res) => {
       return res.status(403).json({ message: 'You are not authorized to edit this advert' });
     }
 
-    const updatedProduct = await Product.findOneAndUpdate(
+    const updatedProduct = await Advert.findOneAndUpdate(
       { _id: productId, user: userId }, // ✅ use 'user', not 'userId'
       req.body,
       { new: true }
@@ -356,7 +358,7 @@ export const updateUserproduct = async (req, res) => {
 export const getAuserProduct = async (req, res) => {
   try {
     const filter = buildAdvertFilter(req.user.id, req.params.id, req.query.category, req.query.subCategory, req.query.name, req.query.price);
-    const adverts = await Product.find(filter).populate('user', '-password -otp');
+    const adverts = await Advert.find(filter).populate('user', '-password -otp');
 
     if (!adverts.length) {
       return res.status(404).json({ message: 'No matching adverts found' });
@@ -372,7 +374,7 @@ export const getalluserProduct = async (req, res) => {
 
   try {
     const userId = req.user.id;
-    const product = await Product.find({ user: userId }).populate('user', '-password -otp') // exclude password, otp field
+    const product = await Advert.find({ user: userId }).populate('user', '-password -otp') // exclude password, otp field
     return res.status(200).json({ message: 'all Product', product })
   } catch (error) {
     res.status(500).json({ message: error.message })
