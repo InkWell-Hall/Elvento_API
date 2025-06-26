@@ -32,7 +32,8 @@ export const userModel = new Schema({
     otp:{
         type: String,
         default: null
-    }
+    },
+    cartData: { type: Object, default: {} },
 
 },{timestamps: true});
 

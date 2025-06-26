@@ -12,6 +12,9 @@ export const roles = [
             'deleteCartItem',
             'getUserCart',
             'getAllcarts',
+            'getUserCart',
+            'addToCart',
+            'updateCart'
         ]
     },
 
