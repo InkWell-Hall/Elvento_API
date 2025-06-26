@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { allOrders, placeOrder, placeOrderRazorpay, placeOrderStripe, updateStatus, userOrders, verifyStripe } from "../controllers/order_controller.js";
-import { authenticate, hasPermission } from "../middleware/auth.js";
+// import { authenticate, hasPermission } from "../middleware/auth.js";
 
 
 
