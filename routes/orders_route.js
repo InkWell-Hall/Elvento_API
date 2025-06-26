@@ -11,16 +11,16 @@ export const ordersRoute = Router();
 // ordersRoute.get('/order/:id',authenticate,hasPermission("getOneOrder"),getOneOrder);
 
 //Admin Features
-ordersRoute.post("/order/list", authenticate, allOrders);
-ordersRoute.post("/status", authenticate, updateStatus);
+ordersRoute.post("/order/list",allOrders);
+ordersRoute.post("/status",updateStatus);
 
 // Payment Routes
-ordersRoute.post("/place", authenticate, placeOrder);
-ordersRoute.post("/razorpay", authenticate, placeOrderRazorpay);
-ordersRoute.post("/stripe", authenticate, placeOrderStripe);
+ordersRoute.post("/place", placeOrder);
+ordersRoute.post("/razorpay", placeOrderRazorpay);
+ordersRoute.post("/stripe", placeOrderStripe);
 
 //user feature
-ordersRoute.post("/userorders", authenticate, userOrders);
+ordersRoute.post("/userorders", userOrders);
 
 //verify payment
-ordersRoute.post("/verifyStripe", authenticate, verifyStripe)
+ordersRoute.post("/verifyStripe", verifyStripe)
