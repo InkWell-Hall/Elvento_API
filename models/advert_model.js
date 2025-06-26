@@ -65,7 +65,12 @@ export const productSchema = new Schema({
     subCategory: {type: String, required:true},
     sizes: {type: Array, required:true},
     bestseller: {type: Boolean},
-    date: {type:Number, required:true}
+    date: {type:Number, required:true},
+    user:{
+        type: Schema.Types.ObjectId,
+        ref:'User',
+        required: true
+    }
 },{timestamps: true})
 
 productSchema.plugin(normalize);
