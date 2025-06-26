@@ -12,4 +12,4 @@ export const cartRoute = Router();
 
 cartRoute.get("/get", authenticate,hasPermission("getUserCart"), getUserCart);
 cartRoute.post("/add", authenticate,hasPermission("addToCart"), addToCart);
-cartRoute.post("/update", authenticate,hasPermission("updateCart"), updateCart)
+cartRoute.patch("/update", authenticate,hasPermission("updateCart"), updateCart)
