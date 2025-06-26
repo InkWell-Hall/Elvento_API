@@ -191,6 +191,8 @@ import { buildAdvertFilter } from "../utils/help.js"
 
 export const addProduct = async (req, res) => {
   try {
+
+    const userID = req.user.id;
     // Debug: Log the entire request body and files
     console.log("Request body:", req.body);
     console.log("Request files:", req.files);
@@ -263,19 +265,20 @@ export const addProduct = async (req, res) => {
       sizes: parsedSizes,
       image: imagesUrl,
       date: Date.now(),
-      uer:req.user.id
+      user:userID
     };
 
     console.log("Product data to save:", productData);
 
     // Save product to database
     const product = new Advert(productData);
-    await product.save().populate('user', '-password -otp');
-
+    await product.save(); // ✅ now it's saved to DB
+    // ✅ Proper way to populate after creation
+    const populatedProduct = await Advert.findById(product.id).populate('user', '-password -otp');
     res.status(201).json({
       success: true,
       message: "Product Added Successfully",
-      product: product
+      product: populatedProduct
     });
 
   } catch (error) {
