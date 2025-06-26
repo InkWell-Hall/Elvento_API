@@ -281,6 +281,8 @@ export const addProduct = async (req, res) => {
       product: populatedProduct
     });
 
+    console.log('saveData',populatedProduct)
+
   } catch (error) {
     console.error("Controller error:", error);
     res.status(500).json({
