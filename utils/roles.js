@@ -17,6 +17,7 @@ export const roles = [
             'updateCart'
         ]
     },
+    
 
     {
         role: "Vendor",
