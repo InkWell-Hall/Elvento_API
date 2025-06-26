@@ -10,6 +10,6 @@ export const cartRoute = Router();
 // cartRoute.get('/cart/:id', authenticate,hasPermission("getUserCart"),getUserCart)
 // cartRoute.get('/cart', authenticate,hasPermission("getAllcarts"),getAllcarts)
 
-cartRoute.post("/get", authenticate,hasPermission("getUserCart"), getUserCart);
+cartRoute.get("/get", authenticate,hasPermission("getUserCart"), getUserCart);
 cartRoute.post("/add", authenticate,hasPermission("addToCart"), addToCart);
 cartRoute.post("/update", authenticate,hasPermission("updateCart"), updateCart)
