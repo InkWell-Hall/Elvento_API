@@ -11,7 +11,7 @@ export const ordersRoute = Router();
 // ordersRoute.get('/order/:id',authenticate,hasPermission("getOneOrder"),getOneOrder);
 
 //Admin Features
-ordersRoute.post("/list", authenticate, allOrders);
+ordersRoute.post("/order/list", authenticate, allOrders);
 ordersRoute.post("/status", authenticate, updateStatus);
 
 // Payment Routes
