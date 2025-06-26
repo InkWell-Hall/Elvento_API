@@ -1,11 +1,26 @@
 import { Router } from "express";
-import { getOneOrder, getOrders, newOrder } from "../controllers/order_controller.js";
+import { allOrders, placeOrder, placeOrderRazorpay, placeOrderStripe, updateStatus, userOrders, verifyStripe } from "../controllers/order_controller.js";
 import { authenticate, hasPermission } from "../middleware/auth.js";
 
 
 
 export const ordersRoute = Router();
 
-ordersRoute.post('/order',authenticate,hasPermission("newOrder"),newOrder);
-ordersRoute.get('/order',authenticate,hasPermission("getOrders"),getOrders);
-ordersRoute.get('/order/:id',authenticate,hasPermission("getOneOrder"),getOneOrder);
+// ordersRoute.post('/order',authenticate,hasPermission("newOrder"),newOrder);
+// ordersRoute.get('/order',authenticate,hasPermission("getOrders"),getOrders);
+// ordersRoute.get('/order/:id',authenticate,hasPermission("getOneOrder"),getOneOrder);
+
+//Admin Features
+ordersRoute.post("/list", authenticate, allOrders);
+ordersRoute.post("/status", authenticate, updateStatus);
+
+// Payment Routes
+ordersRoute.post("/place", authenticate, placeOrder);
+ordersRoute.post("/razorpay", authenticate, placeOrderRazorpay);
+ordersRoute.post("/stripe", authenticate, placeOrderStripe);
+
+//user feature
+ordersRoute.post("/userorders", authenticate, userOrders);
+
+//verify payment
+ordersRoute.post("/verifyStripe", authenticate, verifyStripe)
