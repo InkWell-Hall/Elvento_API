@@ -242,17 +242,16 @@ const getUserCart = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
-
 const delUserCart = async (req, res) => {
   try {
-    const userId = req.user.id; // coming from auth middleware
-    const { itemId } = req.params; // assuming /cart/:itemId
+    const userId = req.user.id;
+    const itemId = req.params.itemId;
 
     if (!itemId) {
       return res.status(400).json({ success: false, message: "Missing itemId" });
     }
 
-    // Remove the entire item from cartData
+    // Delete the entire item (including all sizes)
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $unset: { [`cartData.${itemId}`]: "" } },

@@ -13,4 +13,4 @@ export const cartRoute = Router();
 cartRoute.get("/get/:id", authenticate, getUserCart);
 cartRoute.post("/cart/add", authenticate, addToCart);
 cartRoute.patch("/update", authenticate, updateCart);
-cartRoute.delete("/delete/:id", authenticate, delUserCart);
+cartRoute.delete("/delete/:itemId", authenticate, delUserCart);
