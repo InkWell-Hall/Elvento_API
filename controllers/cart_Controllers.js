@@ -204,7 +204,11 @@ const addToCart = async (req, res) => {
 
     cartData[itemId][size] += 1;
 
-    await User.findByIdAndUpdate(userId, { cartData }).populate('user', '-password -otp');
+    await User.findByIdAndUpdate(
+      userId, 
+      { cartData },
+      { new: true } // Return the updated document
+    ).populate('user', '-password -otp');
 
     res.json({ success: true, message: "Added to Cart" });
   } catch (error) {
