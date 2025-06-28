@@ -96,7 +96,8 @@
 
 // import { currency } from "../../admin/src/App.jsx";
 import { STRIPE_SECRET_KEY } from "../config/env.js";
-import { Order } from "../models/order_model.js";
+import orderModel from "../models/new_order-model.js";
+
 import { User } from "../models/user_model.js";
 import Stripe from "stripe";
 
@@ -123,7 +124,7 @@ const placeOrder = async (req, res) => {
       date: Date.now(),
     };
 
-    const newOrder = new Order(orderData);
+    const newOrder = new orderModel(orderData);
     await newOrder.save();
 
     await User.findByIdAndUpdate(userId, { cartData: {} });
@@ -152,7 +153,7 @@ const placeOrderStripe = async (req, res) => {
       date: Date.now(),
     };
 
-    const newOrder = new Order(orderData);
+    const newOrder = new orderModel(orderData);
     await newOrder.save();
     
     const line_items = items.map((item) => ({
@@ -196,11 +197,11 @@ const verifyStripe = async (req,res) => {
   const {orderId, success, userId} = req.body
   try {
     if(success === "true") {
-      await Order.findByIdAndUpdate(orderId, {payment:true});
+      await orderModel.findByIdAndUpdate(orderId, {payment:true});
       await User.findByIdAndUpdate(userId, {cartData: {}}) 
       res.json({success:true});
     } else {
-      await Order.findByIdAndDelete(orderId)
+      await orderModel.findByIdAndDelete(orderId)
       res.json({success:false})
     }
   } catch (error) {
@@ -216,7 +217,7 @@ const placeOrderRazorpay = async (req, res) => {};
 const allOrders = async (req, res) => {
   try {
     
-    const orders = await Order.find({})
+    const orders = await orderModel.find({})
     res.json({success:true, orders})
 
   } catch (error) {
@@ -230,7 +231,7 @@ const userOrders = async (req, res) => {
   try {
     const {userId} = req.body
 
-    const orders = await Order.find({userId})
+    const orders = await orderModel.find({userId})
     res.json({success:true, orders})
 
   } catch (error) {
@@ -244,7 +245,7 @@ const updateStatus = async (req, res) => {
   try {
     const {orderId, status } = req.body
 
-    await Order.findByIdAndUpdate(orderId, {status })
+    await orderModel.findByIdAndUpdate(orderId, {status })
     res.json({success:true, message:"Status Updated"})
   } catch (error) {
     console.log(error);
