@@ -236,9 +236,10 @@ const updateCart = async (req,res) => {
 //add products to user cart
 const getUserCart = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req.user.id;
+    const cartID = req.params.id;
 
-    const userData = await User.findById(userId);
+    const userData = await User.findById(cartID);
     let cartData = await userData.cartData;
 
     res.json({ success: true, cartData });
