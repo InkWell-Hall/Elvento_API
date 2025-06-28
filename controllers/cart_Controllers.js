@@ -176,8 +176,7 @@ import { User } from "../models/user_model.js";
 // };
 
 
-
-//add products to user cart
+// Add products to user cart
 const addToCart = async (req, res) => {
   try {
     const { userId, itemId, size } = req.body;
@@ -186,36 +185,28 @@ const addToCart = async (req, res) => {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
-    const userData = await User.findById(userId);
+    // Atomically increment the item size quantity in the cart
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { $inc: { [`cartData.${itemId}.${size}`]: 1 } },
+      { new: true } // Return the updated document
+    );
 
-    if (!userData) {
+    if (!updatedUser) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    let cartData = userData.cartData || {}; // Fallback if undefined
-
-    if (!cartData[itemId]) {
-      cartData[itemId] = {};
-    }
-
-    if (!cartData[itemId][size]) {
-      cartData[itemId][size] = 0;
-    }
-
-    cartData[itemId][size] += 1;
-
-    await User.findByIdAndUpdate(
-      userId, 
-      { cartData },
-      { new: true } // Return the updated document
-    ).populate('user', '-password -otp');
-
-    res.json({ success: true, message: "Added to Cart" });
+    res.json({
+      success: true,
+      message: "Added to Cart",
+      cartData: updatedUser.cartData // Optional: return updated cart
+    });
   } catch (error) {
     console.error("Add to Cart Error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 
 //update user cart
