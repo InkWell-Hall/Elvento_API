@@ -34,6 +34,10 @@ export const userModel = new Schema({
         default: null
     },
     cartData: { type: Object, default: {} },
+    user:{
+        type: Schema.Types.ObjectId,
+        ref:'User',
+    }
 
 },{timestamps: true});
 

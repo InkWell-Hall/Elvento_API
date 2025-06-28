@@ -25,7 +25,7 @@ export const productRouter = express.Router();
 
 productRouter.post("/add",authenticate ,upload.fields([{name: "image1", maxCount:1}, {name: "image2", maxCount:1},{name: "image3", maxCount:1},{name: "image4", maxCount:1}]),hasPermission("addProduct"), addProduct)
 productRouter.get("/list", listProducts)
-productRouter.post("/remove", authenticate ,hasPermission("removeProduct"),removeProduct)
+productRouter.delete("/remove/:id", authenticate ,hasPermission("removeProduct"),removeProduct)
 productRouter.post("/single", singleProduct)
 productRouter.patch("/single/:id", authenticate ,hasPermission("updateUserproduct"),updateUserproduct)
 productRouter.get("/single/:id", authenticate ,hasPermission("getAuserProduct"),getAuserProduct)

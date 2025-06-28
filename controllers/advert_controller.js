@@ -185,7 +185,7 @@
 // };
 
 import { v2 as cloudinary } from "cloudinary"
-import { Advert} from "../models/advert_model.js"
+import { Advert } from "../models/advert_model.js"
 import { buildAdvertFilter } from "../utils/help.js"
 
 
@@ -265,7 +265,7 @@ export const addProduct = async (req, res) => {
       sizes: parsedSizes,
       image: imagesUrl,
       date: Date.now(),
-      user:userID
+      user: userID
     };
 
     console.log("Product data to save:", productData);
@@ -281,7 +281,7 @@ export const addProduct = async (req, res) => {
       product: populatedProduct
     });
 
-    console.log('saveData',populatedProduct)
+    console.log('saveData', populatedProduct)
 
   } catch (error) {
     console.error("Controller error:", error);
@@ -307,11 +307,30 @@ export const listProducts = async (req, res) => {
 //function for removing a product
 export const removeProduct = async (req, res) => {
   try {
-    await Advert.findByIdAndDelete(req.body.id)
-    res.json({ success: true, message: "Product Removed" })
+    const advertID = req.params.id;
+    const userID = req.user.id;
+
+    if (!advertID) {
+      return res.status(400).json({ message: 'Advert ID cant be found' })
+    }
+    const advert = await Advert.findById(advertID);
+
+    if (!advert) {
+      return res.status(400).json({ message: 'Cant find this Advert' })
+    }
+
+    if (advert.user.toString() !== userID.toString()) {
+      return res.status(400).json({ message: 'Not allowed to delete this Advert' })
+    }
+    console.log('advert.user:', advert.user);
+    console.log('userID:', userID);
+
+
+    await Advert.findByIdAndDelete(advertID)
+    return res.status(200).json({ message: "Product Removed" })
   } catch (error) {
     console.log(error)
-    res.json({ success: false, message: error.message })
+    res.status(500).json({ message: error.message })
   }
 }
 
@@ -344,10 +363,10 @@ export const updateUserproduct = async (req, res) => {
     }
 
     const updatedProduct = await Advert.findOneAndUpdate(
-      { _id: productId, user: userId }, // ✅ use 'user', not 'userId'
+      { id: productId, user: userId },
       req.body,
       { new: true }
-    );
+    ).populate('user', '-password -otp');
 
     if (!updatedProduct) {
       return res.status(400).json({ message: 'Update failed' });
