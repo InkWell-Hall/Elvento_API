@@ -175,8 +175,6 @@ import { User } from "../models/user_model.js";
 //   }
 // };
 
-
-// Add products to user cart
 const addToCart = async (req, res) => {
   try {
     const { userId, itemId, size } = req.body;
@@ -185,11 +183,11 @@ const addToCart = async (req, res) => {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
-    // Atomically increment the item size quantity in the cart
+    // Corrected: use _id instead of id
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
       { $inc: { [`cartData.${itemId}.${size}`]: 1 } },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     if (!updatedUser) {
@@ -199,7 +197,8 @@ const addToCart = async (req, res) => {
     res.json({
       success: true,
       message: "Added to Cart",
-      cartData: updatedUser.cartData // Optional: return updated cart
+      cartId: updatedUser._id, // Treat this as the cart ID
+      cartData: updatedUser.cartData
     });
   } catch (error) {
     console.error("Add to Cart Error:", error);
