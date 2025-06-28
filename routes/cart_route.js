@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticate, hasPermission } from "../middleware/auth.js";
-import { addToCart, getUserCart,  updateCart, } from "../controllers/cart_Controllers.js";
+import { addToCart, delUserCart, getUserCart,  updateCart, } from "../controllers/cart_Controllers.js";
 
 export const cartRoute = Router();
 
@@ -12,4 +12,5 @@ export const cartRoute = Router();
 
 cartRoute.get("/get/:id", authenticate, getUserCart);
 cartRoute.post("/cart/add", authenticate, addToCart);
-cartRoute.patch("/update", authenticate, updateCart)
+cartRoute.patch("/update", authenticate, updateCart);
+cartRoute.delete("/delete/:id", authenticate, delUserCart);

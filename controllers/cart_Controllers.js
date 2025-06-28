@@ -243,4 +243,38 @@ const getUserCart = async (req, res) => {
   }
 };
 
-export { addToCart, updateCart, getUserCart };
+const delUserCart = async (req, res) => {
+  try {
+    const userId = req.user.id; // coming from auth middleware
+    const { itemId } = req.params; // assuming /cart/:itemId
+
+    if (!itemId) {
+      return res.status(400).json({ success: false, message: "Missing itemId" });
+    }
+
+    // Remove the entire item from cartData
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $unset: { [`cartData.${itemId}`]: "" } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      message: `Item '${itemId}' removed from cart`,
+      cartData: updatedUser.cartData
+    });
+
+  } catch (error) {
+    console.error("Delete Cart Item Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+
+export { addToCart, updateCart, getUserCart,delUserCart  };
