@@ -363,7 +363,7 @@ export const updateUserproduct = async (req, res) => {
     }
 
     const updatedProduct = await Advert.findOneAndUpdate(
-      { id: productId, user: userId },
+      { _id: productId, user: userId },
       req.body,
       { new: true }
     ).populate('user', '-password -otp');
