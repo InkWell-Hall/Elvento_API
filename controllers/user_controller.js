@@ -107,3 +107,28 @@ export const loginUser = async (req, res) => {
         res.status(500).json({ message: 'Error logging in user' });
     }
 };
+
+export const allUser = async (req, res) =>{
+    try {
+        const allUsers = await User.find().populate('user','-otp -password');
+        return res.status(200).json({message: 'These are All Users',allUsers});
+    } catch (error) {
+        return res.status(500).json({message: 'Error getting Users'});
+    }
+}
+
+export const aUser = async(req, res) => {
+    try {
+        const userID = req.params.id
+        const aUser = await User.findById(userID).populate('user','-otp -password')
+
+        // check if both id matches, the one in the db and the one in the body (/:id)
+        if(aUser.id.toString() !== userID.toString()){
+            return res.status(400).json({message:'User Does not Exist'})
+        }
+        return res.status(200).json({message:'User Found',aUser})
+    } catch (error) {
+        return res.satus(500).json({message:'Error getting User'})
+        
+    }
+}
