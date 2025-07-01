@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { allOrders, placeOrder, placeOrderRazorpay, placeOrderStripe, updateStatus, userOrders, verifyStripe } from "../controllers/order_controller.js";
+import { allOrders, getVendorOrdersAcrossAdverts, placeOrder, placeOrderRazorpay, placeOrderStripe, updateStatus, verifyStripe } from "../controllers/order_controller.js";
 // import { authenticate, hasPermission } from "../middleware/auth.js";
 
 
@@ -20,7 +20,7 @@ ordersRoute.post("/razorpay", placeOrderRazorpay);
 ordersRoute.post("/stripe", placeOrderStripe);
 
 //user feature
-ordersRoute.post("/userorders", userOrders);
+ordersRoute.post("/userorders/:id", getVendorOrdersAcrossAdverts);
 
 //verify payment
 ordersRoute.post("/verifyStripe", verifyStripe)

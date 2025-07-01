@@ -96,7 +96,10 @@
 
 // import { currency } from "../../admin/src/App.jsx";
 import { STRIPE_SECRET_KEY } from "../config/env.js";
+import { sendDeliveryEmail } from "../config/mail.js";
+import { Advert } from "../models/advert_model.js";
 import orderModel from "../models/new_order-model.js";
+import { Order } from "../models/order_model.js";
 
 import { User } from "../models/user_model.js";
 import Stripe from "stripe";
@@ -112,7 +115,7 @@ const stripe = new Stripe(STRIPE_SECRET_KEY)
 const placeOrder = async (req, res) => {
   try {
     const { userId, items, amount, address } = req.body;
-    
+
 
     const orderData = {
       userId,
@@ -138,11 +141,11 @@ const placeOrder = async (req, res) => {
 //placing orders using Stripe method
 const placeOrderStripe = async (req, res) => {
   try {
-    
-    const { userId, items, amount, address } = req.body;
-    const {origin} = req.headers;
 
-    
+    const { userId, items, amount, address } = req.body;
+    const { origin } = req.headers;
+
+
     const orderData = {
       userId,
       items,
@@ -155,37 +158,37 @@ const placeOrderStripe = async (req, res) => {
 
     const newOrder = new orderModel(orderData);
     await newOrder.save();
-    
+
     const line_items = items.map((item) => ({
       price_data: {
         currency: currency,
         product_data: {
           name: item.name
-      },
-      unit_amount: item.price * 100
+        },
+        unit_amount: item.price * 100
       },
       quantity: item.quantity
     }))
 
     line_items.push({
-    price_data: {
+      price_data: {
         currency: currency,
         product_data: {
           name: "Delivery Charges"
+        },
+        unit_amount: deliveryCharge * 100
       },
-      unit_amount: deliveryCharge * 100
-      },
-      quantity:1
+      quantity: 1
     });
 
     const session = await stripe.checkout.sessions.create({
-          success_url:`${origin}/verify?success=true&orderId=${newOrder._id}`,
-          cancel_url:`${origin}/verify?success=false&orderId=${newOrder._id}`,
-          line_items,
-          mode: "payment",
+      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
+      cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
+      line_items,
+      mode: "payment",
     })
 
-    res.json({success:true, session_url:session.url})
+    res.json({ success: true, session_url: session.url })
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -193,16 +196,16 @@ const placeOrderStripe = async (req, res) => {
 };
 
 //Verify stripe
-const verifyStripe = async (req,res) => {
-  const {orderId, success, userId} = req.body
+const verifyStripe = async (req, res) => {
+  const { orderId, success, userId } = req.body
   try {
-    if(success === "true") {
-      await orderModel.findByIdAndUpdate(orderId, {payment:true});
-      await User.findByIdAndUpdate(userId, {cartData: {}}) 
-      res.json({success:true});
+    if (success === "true") {
+      await orderModel.findByIdAndUpdate(orderId, { payment: true });
+      await User.findByIdAndUpdate(userId, { cartData: {} })
+      res.json({ success: true });
     } else {
       await orderModel.findByIdAndDelete(orderId)
-      res.json({success:false})
+      res.json({ success: false })
     }
   } catch (error) {
     console.log(error);
@@ -211,14 +214,14 @@ const verifyStripe = async (req,res) => {
 }
 
 //placing orders using RazorPay method
-const placeOrderRazorpay = async (req, res) => {};
+const placeOrderRazorpay = async (req, res) => { };
 
 //All orders data for admin panel
 const allOrders = async (req, res) => {
   try {
-    
+
     const orders = await orderModel.find({})
-    res.json({success:true, orders})
+    res.json({ success: true, orders })
 
   } catch (error) {
     console.log(error);
@@ -226,30 +229,77 @@ const allOrders = async (req, res) => {
   }
 };
 
-//User Order data for frontend
-const userOrders = async (req, res) => {
+const getVendorOrdersAcrossAdverts = async (req, res) => {
   try {
-    const {userId} = req.body
+    const vendorId = req.params.id;
 
-    const orders = await orderModel.find({userId})
-    res.json({success:true, orders})
+    // 1. Confirm the vendor exists
+    const vendor = await User.findById(vendorId);
+    if (!vendor) {
+      return res.status(404).json({ success: false, message: "Vendor not found" });
+    }
+
+    // 2. Find all adverts created by this vendor
+    const adverts = await Advert.find({ user: vendorId });
+
+    // 3. Extract all advert IDs
+    const advertIds = adverts.map(ad => ad._id);
+
+    // 4. Find orders that reference any of these advert IDs
+    const orders = await orderModel
+      .find({ advertId: { $in: advertIds } })
+      .populate("userId", "userName email")      // buyer details
+      .populate("advertId", "name price image"); // advert details
+
+    // 5. Send response
+    res.status(200).json({
+      success: true,
+      vendor: {
+        id: vendor._id,
+        name: vendor.userName,
+        email: vendor.email
+      },
+      totalAdverts: adverts.length,
+      totalOrders: orders.length,
+      orders
+    });
 
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error("Error in getVendorOrdersAcrossAdverts:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 //update order status for admin panel
 const updateStatus = async (req, res) => {
   try {
-    const {orderId, status } = req.body
+    const { orderId, status } = req.body
 
-    await orderModel.findByIdAndUpdate(orderId, {status })
-    res.json({success:true, message:"Status Updated"})
+    const order = await orderModel.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    ).populate('userId');
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+    res.json({ success: true, message: "Status Updated" })
+
+    if (status.toString() === "out for delivery") {
+      const email = order.userId.email
+      if (email) {
+        await sendDeliveryEmail(email);
+        console.log("📦 Delivery message sent to email:", email);
+      } else {
+        console.log("⚠️ No email found for user.");
+      }
+    }
+
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -258,7 +308,7 @@ export {
   placeOrderRazorpay,
   placeOrderStripe,
   updateStatus,
-  userOrders,
+  getVendorOrdersAcrossAdverts,
   allOrders,
   verifyStripe
 };
