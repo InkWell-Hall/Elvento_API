@@ -276,6 +276,7 @@ const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body
 
+    // updates status
     const order = await orderModel.findByIdAndUpdate(
       orderId,
       { status },
@@ -287,7 +288,7 @@ const updateStatus = async (req, res) => {
     }
     res.json({ success: true, message: "Status Updated" })
 
-    if (status.toString() === "out for delivery") {
+    if (status.toString() === "Out for Delivery") {
       const email = order.userId.email
       if (email) {
         await sendDeliveryEmail(email);
